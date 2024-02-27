@@ -1,5 +1,6 @@
-import './UsersList.css'
+import Card from '../../shared/components/UIElements/Card';
 import UserItem from './UserItem'
+import './UsersList.css'
 
 interface User {
     id: string;
@@ -16,7 +17,9 @@ const UsersList = (props: UsersListProps) => {
 
     if(props.items.length === 0){
         return <div className="center">
-            <h2>No users found.</h2>
+            <Card className={''} style={{}}>
+                <h2>No users found.</h2>
+            </Card>
         </div>
     }
   return (
