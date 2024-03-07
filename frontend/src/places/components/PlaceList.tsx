@@ -2,6 +2,11 @@ import Card from '../../shared/components/UIElements/Card'
 import PlaceItem from './PlaceItem';
 import './PlaceList.css'
 
+interface Location {
+    lat: number;
+    lng: number;
+}
+
 interface Place {
     id: string;
     imageUrl: string;
@@ -9,7 +14,7 @@ interface Place {
     description: string;
     address: string;
     creator: string;
-    location: object
+    location: Location
 }
 
 interface PlaceListProps {
