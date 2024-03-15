@@ -1,4 +1,5 @@
 import { useReducer } from "react";
+import { validate } from "../../util/validator";
 import "./Input.css";
 
 interface InputProps {
@@ -12,17 +13,41 @@ interface InputProps {
   onChange?: (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
+  onBlur?: () => void;
   errorText: string;
+  validators: Validator[];
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const inputReducer = (state: any, action: any) => {
+interface InputState {
+  value: string;
+  isValid: boolean;
+  isTouched: boolean;
+}
+
+interface Action {
+  type: string;
+  val: string;
+  validators: Validator[];
+}
+
+interface Validator {
+  type: string;
+  value: string | number;
+}
+
+const inputReducer = (state: InputState, action: Action) => {
   switch (action.type) {
     case "CHANGE":
       return {
         ...state,
         value: action.val,
-        isValid: true,
+        isValid: validate(action.val, action.validators),
+      };
+
+    case "TOUCH":
+      return {
+        ...state,
+        isTouched: true,
       };
     default:
       return state;
@@ -33,12 +58,25 @@ const Input = (props: InputProps) => {
   const [inputState, dispatch] = useReducer(inputReducer, {
     value: "",
     isValid: false,
+    isTouched: false,
   });
 
   const changeHandler = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    dispatch({ type: "CHANGE", val: event.target.value });
+    dispatch({
+      type: "CHANGE",
+      val: event.target.value,
+      validators: props.validators,
+    });
+  };
+
+  const touchHandler = () => {
+    dispatch({
+      type: "TOUCH",
+      val: "",
+      validators: [],
+    });
   };
 
   const element =
@@ -48,6 +86,7 @@ const Input = (props: InputProps) => {
         type={props.type}
         placeholder={props.placeholder}
         onChange={changeHandler}
+        onBlur={touchHandler}
         value={inputState.value}
       />
     ) : (
@@ -55,18 +94,19 @@ const Input = (props: InputProps) => {
         id={props.id}
         rows={props.rows || 3}
         onChange={changeHandler}
+        onBlur={touchHandler}
         value={inputState.value}
       />
     );
   return (
     <div
       className={`form-control ${
-        !inputState.isValid && `form-control--invalid`
+        !inputState.isValid && inputState.isTouched && `form-control--invalid`
       }`}
     >
       <label htmlFor={props.id}>{props.label}</label>
       {element}
-      {!inputState.isValid && <p>{props.errorText}</p>}
+      {!inputState.isValid && inputState.isTouched && <p>{props.errorText}</p>}
     </div>
   );
 };
