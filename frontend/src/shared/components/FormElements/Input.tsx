@@ -1,4 +1,4 @@
-import { useReducer } from "react";
+import { useReducer, useEffect } from "react";
 import { validate } from "../../util/validator";
 import "./Input.css";
 
@@ -10,12 +10,14 @@ interface InputProps {
   placeholder?: string;
   value?: string;
   rows?: number;
+  valid?: boolean;
   onChange?: (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
   onBlur?: () => void;
   errorText: string;
   validators: Validator[];
+  onInput: (id: string, value: string, isValid: boolean) => void;
 }
 
 interface InputState {
@@ -56,10 +58,17 @@ const inputReducer = (state: InputState, action: Action) => {
 
 const Input = (props: InputProps) => {
   const [inputState, dispatch] = useReducer(inputReducer, {
-    value: "",
-    isValid: false,
+    value: props.value || "",
+    isValid: props.valid || false,
     isTouched: false,
   });
+
+  const { id, onInput } = props;
+  const { value, isValid } = inputState;
+
+  useEffect(() => {
+    onInput(id, value, isValid);
+  }, [id, value, isValid, onInput]);
 
   const changeHandler = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>

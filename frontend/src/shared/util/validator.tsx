@@ -27,7 +27,7 @@ export const VALIDATOR_MAX = (val: number): Validator => ({
 export const VALIDATOR_EMAIL = () => ({ type: VALIDATOR_TYPE_EMAIL });
 
 export interface Validator {
-  type: string;
+  type: string | number;
   val?: number;
 }
 
